@@ -42,7 +42,6 @@ def solve_weighted_intervals(intervals):
     compatible = find_compatible_previous(intervals)
 
     # Initialize the optimal value array for memoization
-    # optimal_values[j] represents the maximum weight achievable using intervals up to index j-1
     optimal_values = [0] * (n + 1)
     
     optimal_values[0] = 0 # Base case
@@ -171,7 +170,6 @@ def plot_results(dp_sizes, compare_sizes, dp_runtimes, compare_dp_runtimes, brut
     plt.close()
 
 def visualize_optimal_intervals(intervals, optimal_intervals):
-    # Visualize all intervals and highlight the optimal ones
     fig, ax = plt.subplots(figsize=(10, len(intervals) * 0.4))
 
     # Plot each interval as a horizontal bar
@@ -183,7 +181,6 @@ def visualize_optimal_intervals(intervals, optimal_intervals):
         
         # Draw the interval as a horizontal bar
         ax.barh(i, interval.end - interval.start, left=interval.start, height=0.4, color=color, alpha=alpha)
-        # Annotate the weight in the middle of the bar
         ax.text((interval.start + interval.end) / 2, i, f'w={interval.weight}', 
                 ha='center', va='center', color='white' if is_optimal else 'black', fontsize=8)
 
@@ -200,9 +197,9 @@ def visualize_optimal_intervals(intervals, optimal_intervals):
     plt.close()
 
 
-# ----------------------------------
-#  Run algorithm and visualizations
-# ----------------------------------
+# -------------------------------------
+#  Running algorithm and visualizations
+# -------------------------------------
 
 if __name__ == "__main__":
     # Performance analysis
@@ -211,7 +208,7 @@ if __name__ == "__main__":
     dp_runtimes, compare_dp_runtimes, brute_runtimes, memories = performance_analysis(dp_sizes, compare_sizes)
     plot_results(dp_sizes, compare_sizes, dp_runtimes, compare_dp_runtimes, brute_runtimes, memories)
 
-    # Visualize optimal intervals for a small set (15 intervals)
+    # Visualize optimal intervals for 15 intervals
     intervals = generate_intervals(15, max_time=100, max_weight=50)
     optimal_values, compatible = solve_weighted_intervals(intervals)
     optimal_intervals = reconstruct_optimal_solution(intervals, compatible, optimal_values)
