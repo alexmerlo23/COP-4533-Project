@@ -1,5 +1,4 @@
 import random
-import bisect
 import time
 import tracemalloc
 import matplotlib.pyplot as plt
@@ -24,8 +23,7 @@ def generate_intervals(n, max_time=1000, max_weight=100):
 
 def find_compatible_previous(intervals):    
     # Time complexity: O(n^2)
-    # Find the index of the last compatible interval for each interval
-    # Compatible means the previous interval's end time is <= current interval's start time
+    # Find the index of the last compatible interval for each interval. Compatible meaning the previous interval's end time is <= current interval's start time
     compatible = []
     for j in range(len(intervals)):
         last_compatible = -1  # no compatible interval
@@ -62,10 +60,6 @@ def solve_weighted_intervals(intervals):
 
 
 def brute_force_intervals(intervals, ind, last_end):
-    # Brute force recursive solution for weighted interval scheduling
-    # ind: current interval index
-    # last_end: end time of the last selected interval
-    # Returns maximum weight achievable from index ind onward
     if ind == len(intervals):
         return 0  # Base case: no more intervals
 
@@ -97,47 +91,13 @@ def reconstruct_optimal_solution(intervals, compatible, optimal_values):
     return solution
 
 
-def visualize_optimal_intervals(intervals, optimal_intervals):
-    # Visualize all intervals and highlight the optimal ones
-    fig, ax = plt.subplots(figsize=(10, len(intervals) * 0.4))
-
-    # Plot each interval as a horizontal bar
-    for i, interval in enumerate(intervals):
-        # Determine if this interval is in the optimal solution
-        is_optimal = interval in optimal_intervals
-        color = 'green' if is_optimal else 'gray'
-        alpha = 1.0 if is_optimal else 0.3
-        
-        # Draw the interval as a horizontal bar
-        ax.barh(i, interval.end - interval.start, left=interval.start, height=0.4, color=color, alpha=alpha)
-        # Annotate the weight in the middle of the bar
-        ax.text((interval.start + interval.end) / 2, i, f'w={interval.weight}', 
-                ha='center', va='center', color='white' if is_optimal else 'black', fontsize=8)
-
-    # Set labels and title
-    ax.set_xlabel('Time')
-    ax.set_ylabel('Intervals')
-    ax.set_yticks(range(len(intervals)))
-    ax.set_yticklabels([f'[{interval.start}, {interval.end}]' for interval in intervals])
-    ax.set_title('Weighted Interval Scheduling: Optimal Intervals')
-    
-    # Adjust layout and save the plot
-    plt.tight_layout()
-    plt.savefig('optimal_intervals_plot.png')
-    plt.close()
-
-
-# -------------------------------
-#  Experimental Analysis
-# -------------------------------
-
 def performance_analysis(dp_sizes, compare_sizes):
     dp_runtimes = []
     compare_dp_runtimes = []
     brute_runtimes = []
     memories = []
 
-    # Dynamic programming performance (large sizes for standalone plot)
+    # Dynamic programming performance
     for n in dp_sizes:
         intervals = generate_intervals(n)
         tracemalloc.start()
@@ -163,7 +123,7 @@ def performance_analysis(dp_sizes, compare_sizes):
 
         # Brute force
         intervals = generate_intervals(n)
-        intervals.sort(key=lambda x: x.end)  # Sort for consistency
+        intervals.sort(key=lambda x: x.end)
         start_time = time.perf_counter()
         _ = brute_force_intervals(intervals, 0, 0)
         end_time = time.perf_counter()
@@ -175,7 +135,7 @@ def performance_analysis(dp_sizes, compare_sizes):
 def plot_results(dp_sizes, compare_sizes, dp_runtimes, compare_dp_runtimes, brute_runtimes, memories):
     # Plot 1: Dynamic programming runtime (large sizes)
     fig1, ax1 = plt.subplots()
-    ax1.plot(dp_sizes, dp_runtimes, marker='o', color='tab:blue', label='Dynamic Programming Runtime')
+    ax1.plot(dp_sizes, dp_runtimes, marker='o', color='tab:blue', label='Dynamic Programming Runtime (O(n²))')
     ax1.set_xlabel('Input Size (Number of Intervals)')
     ax1.set_ylabel('Runtime (seconds)')
     ax1.set_title('Dynamic Programming Runtime (O(n²))')
@@ -210,6 +170,35 @@ def plot_results(dp_sizes, compare_sizes, dp_runtimes, compare_dp_runtimes, brut
     plt.savefig("runtime_comparison_plot.png")
     plt.close()
 
+def visualize_optimal_intervals(intervals, optimal_intervals):
+    # Visualize all intervals and highlight the optimal ones
+    fig, ax = plt.subplots(figsize=(10, len(intervals) * 0.4))
+
+    # Plot each interval as a horizontal bar
+    for i, interval in enumerate(intervals):
+        # Determine if this interval is in the optimal solution
+        is_optimal = interval in optimal_intervals
+        color = 'green' if is_optimal else 'gray'
+        alpha = 1.0 if is_optimal else 0.3
+        
+        # Draw the interval as a horizontal bar
+        ax.barh(i, interval.end - interval.start, left=interval.start, height=0.4, color=color, alpha=alpha)
+        # Annotate the weight in the middle of the bar
+        ax.text((interval.start + interval.end) / 2, i, f'w={interval.weight}', 
+                ha='center', va='center', color='white' if is_optimal else 'black', fontsize=8)
+
+    # Set labels and title
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Intervals')
+    ax.set_yticks(range(len(intervals)))
+    ax.set_yticklabels([f'[{interval.start}, {interval.end}]' for interval in intervals])
+    ax.set_title('Weighted Interval Scheduling: Optimal Intervals')
+    
+    # Adjust layout and save the plot
+    plt.tight_layout()
+    plt.savefig('optimal_intervals_plot.png')
+    plt.close()
+
 
 # ----------------------------------
 #  Run algorithm and visualizations
@@ -217,13 +206,13 @@ def plot_results(dp_sizes, compare_sizes, dp_runtimes, compare_dp_runtimes, brut
 
 if __name__ == "__main__":
     # Performance analysis
-    dp_sizes = [100, 200, 500, 1000, 2000, 3000, 4000, 5000, 6000, 8000]
-    compare_sizes = [10, 20, 30, 40, 50]  # Sizes for DP vs. brute force comparison
+    dp_sizes = [100, 1000, 2000, 4000, 6000, 8000]
+    compare_sizes = [10, 15, 20, 25, 30, 35, 40]  # Sizes for DP vs. brute force comparison
     dp_runtimes, compare_dp_runtimes, brute_runtimes, memories = performance_analysis(dp_sizes, compare_sizes)
     plot_results(dp_sizes, compare_sizes, dp_runtimes, compare_dp_runtimes, brute_runtimes, memories)
 
-    # Visualize optimal intervals for a small set (25 intervals)
-    intervals = generate_intervals(25, max_time=100, max_weight=50)
+    # Visualize optimal intervals for a small set (15 intervals)
+    intervals = generate_intervals(15, max_time=100, max_weight=50)
     optimal_values, compatible = solve_weighted_intervals(intervals)
     optimal_intervals = reconstruct_optimal_solution(intervals, compatible, optimal_values)
     visualize_optimal_intervals(intervals, optimal_intervals)
